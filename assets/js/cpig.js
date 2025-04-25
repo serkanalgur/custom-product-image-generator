@@ -145,7 +145,7 @@ jQuery(function ($) {
 			dataType: "json",
 			delay: 250,
 			data: (params) => ({
-				action: "cpio_search_products",
+				action: "cpig_search_products",
 				q: params.term || "",
 				page: params.page || 1,
 				nonce: cpig_ajax.nonce,
@@ -202,7 +202,7 @@ jQuery(function ($) {
 		const dataURL = canvas.toDataURL({ format: "png" });
 		dash.removeClass("dnon").addClass("spin");
 		$.post(cpig_ajax.ajax_url, {
-			action: "cpio_save_image",
+			action: "cpig_save_image",
 			image: dataURL,
 			product_id: pid,
 			nonce: cpig_ajax.nonce,
