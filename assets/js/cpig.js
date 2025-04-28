@@ -1,4 +1,9 @@
 jQuery(function ($) {
+	$("#tab-container").easytabs({
+		updateHash: false,
+		animate: false,
+	});
+
 	// Load Google Fonts via WebFontLoader
 	WebFont.load({
 		google: {
@@ -59,6 +64,12 @@ jQuery(function ($) {
           <option value="center">Center</option>
           <option value="right">Right</option>
         </select>
+		<select class="use-text-template" data-idx="${idx}">
+			<option value="">Select Template</option>
+			<option value="{product_name}">Product Name</option>
+		  <option value="{sku_code}">SKU</option>
+		</select>
+		<!--<button class="button cpig-rempove-text" data-idx="${idx}"">Remove</button>-->
       </div>`
 		);
 	}
@@ -102,6 +113,12 @@ jQuery(function ($) {
 		});
 		$ctrl.find(".cpig-underline-toggle").on("click", function () {
 			$(this).toggleClass("active").trigger("input");
+		});
+
+		$ctrl.find(".use-text-template").on("change", function () {
+			const i = $(this).data("idx");
+			console.log($(this).val());
+			$ctrl.find(`.cpig-text-field[data-idx="${i}"]`).val($(this).val());
 		});
 	}
 
@@ -214,5 +231,14 @@ jQuery(function ($) {
 				$.notify("Error: " + res.data, "error");
 			}
 		});
+	});
+
+	$("#cpig-save-as-template").on("click", () => {
+		let ttitle = prompt("Enter Template Name");
+		if (ttitle == null || ttitle == "") {
+			$.notify("Template title not set", "error");
+		} else {
+			$.notify("Template title:" + ttitle, "success");
+		}
 	});
 });

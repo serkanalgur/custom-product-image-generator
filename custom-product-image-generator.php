@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Custom Product Image Generator
  * Description: Extended controls over WooCommerce product images.
- * Version:     1.0.0
+ * Version:     1.0.1
  * Text Domain: cpig
  * Author:          serkanalgur
  * Author URI:      https://serkanalgur.com.tr
@@ -12,6 +12,9 @@
 if (! defined('ABSPATH')) {
     exit;
 }
+define('PLGVER', '1.0.1');
+
+require_once plugin_dir_path(__FILE__) . '/includes/admin-custom-product-image-generator.php';
 
 add_action('admin_menu', 'cpig_add_admin_menu');
 function cpig_add_admin_menu()
@@ -42,16 +45,27 @@ function cpig_enqueue_assets($hook)
     wp_deregister_script('select2');
 
     // Enqueue the Select2 styles and scripts from the CDN
-    wp_enqueue_style("select2", "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css");
-    wp_enqueue_script("select2", "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js", array('jquery'), null, true);
+    wp_enqueue_style(
+        "select2",
+        "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css"
+    );
+    wp_enqueue_script(
+        "select2",
+        "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js",
+        array('jquery'),
+        null,
+        true
+    );
 
     // Google Fonts stylesheet
+    // phpcs:disable
     wp_enqueue_style(
         'cpig-google-fonts',
         'https://fonts.googleapis.com/css2?&family=Roboto:wght@400;700&family=Montserrat:wght@400;700&family=Open+Sans:wght@400;700&family=Noto+Sans&family=Inter&family=Oswald&display=swap',
         [],
         null
     );
+    // phpcs:enable
 
     // WebFontLoader for Fabric.js
     wp_enqueue_script(
@@ -80,19 +94,27 @@ function cpig_enqueue_assets($hook)
         true
     );
 
+    wp_enqueue_script(
+        'easytabs',
+        'https://cdnjs.cloudflare.com/ajax/libs/jquery.easytabs/3.2.0/jquery.easytabs.min.js',
+        ['jquery', 'select2', 'fabric-js', 'notify-js', 'webfontloader'],
+        PLGVER,
+        true
+    );
+
     // Plugin JS & CSS
     wp_enqueue_script(
         'cpig-admin-js',
         plugin_dir_url(__FILE__) . 'assets/js/cpig.js',
         ['jquery', 'select2', 'fabric-js', 'notify-js', 'webfontloader'],
-        '1.0.0',
+        PLGVER,
         true
     );
     wp_enqueue_style(
         'cpig-admin-css',
         plugin_dir_url(__FILE__) . 'assets/css/cpig.css',
         [],
-        '1.0.0'
+        PLGVER
     );
 
     wp_localize_script('cpig-admin-js', 'cpig_ajax', [
@@ -101,57 +123,7 @@ function cpig_enqueue_assets($hook)
     ]);
 }
 
-function cpig_render_admin_page()
-{
-?>
-<div class="wrap">
-    <h1><?php esc_html_e('Custom Product Image Generator', 'cpig'); ?> <small>by Serkan Algur</small></h1>
-    <hr>
-    <div class="cpig-admin-container">
 
-        <div class="cpig-sidebar">
-            <button id="cpig-select-image"
-                class="button button-primary"><?php esc_html_e('Select Base Image', 'cpig'); ?></button>
-            <button id="cpig-add-text" class="button"><?php esc_html_e('Add Text Field', 'cpig'); ?></button>
-
-            <div id="cpig-text-list" class="cpig-text-list"></div>
-
-            <div class="cpig-logo-item">
-                <label><?php esc_html_e('Upload Logo 1:', 'cpig'); ?></label>
-                <button id="cpig-add-logo1" class="button"><?php esc_html_e('Add Logo 1', 'cpig'); ?></button>
-            </div>
-
-            <div class="cpig-logo-item">
-                <label><?php esc_html_e('Upload Logo 2:', 'cpig'); ?></label>
-                <button id="cpig-add-logo2" class="button"><?php esc_html_e('Add Logo 2', 'cpig'); ?></button>
-            </div>
-
-
-            <p>
-                <label><?php esc_html_e('Choose Product:', 'cpig'); ?><br>
-                    <select id="cpig-product-select" style="width:100%;"></select>
-                </label>
-            </p>
-
-
-
-            <button id="cpig-generate" class="button button-primary"><span
-                    class="dashicons dashicons-update mika dnon"></span>
-                <?php esc_html_e('Generate & Save', 'cpig'); ?></button>
-        </div>
-
-        <div class="cpig-canvas-wrapper">
-            <canvas id="cpig-canvas"></canvas>
-            <div class="cpig-ruler">
-                <div class="cpig-ruler-h"></div>
-                <div class="cpig-ruler-v"></div>
-            </div>
-        </div>
-
-    </div>
-</div>
-<?php
-}
 
 add_action('wp_ajax_cpig_search_products', 'cpig_search_products');
 function cpig_search_products()

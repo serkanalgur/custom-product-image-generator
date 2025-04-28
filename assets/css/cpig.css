@@ -1,10 +1,62 @@
+.etabs {
+	margin: 0;
+	padding: 0;
+}
+.tab {
+	display: inline-block;
+	zoom: 1;
+	/**display: inline;*/
+	background: #eee;
+	border: 1px solid #e5e5e5;
+	border-bottom: none;
+	margin-bottom: 0px;
+	border-radius: 0 0 4px 4px;
+	-moz-border-radius: 4px 4px 0 0;
+	-webkit-border-radius: 4px 4px 0 0;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.tab a {
+	font-size: 14px;
+	line-height: 2em;
+	display: block;
+	padding: 5px 10px;
+	outline: none;
+	text-decoration: none;
+}
+.tab a:hover {
+	text-decoration: none;
+	outline: 0;
+}
+.tab a:focus {
+	outline: none;
+	box-shadow: none;
+}
+.tab.active {
+	background: #fff;
+	position: relative;
+	top: 1px;
+	outline: none;
+	box-shadow: none;
+}
+.tab a.active {
+	font-weight: bold;
+}
+.tab-container .panel-container {
+	background: #ffffff;
+	border: solid #e5e5e5 1px;
+	padding: 10px;
+	border-radius: 0 0 4px 4px;
+	-moz-border-radius: 0 4px 4px 4px;
+	-webkit-border-radius: 0 4px 4px 4px;
+}
+
 .cpig-admin-container {
 	display: flex;
 	gap: 20px;
 }
 .cpig-sidebar {
 	width: 400px;
-	background: #fff;
+	background: #f0f0f1;
 	border: 1px solid #e5e5e5;
 	padding: 20px;
 	border-radius: 4px;
@@ -12,7 +64,7 @@
 }
 .cpig-canvas-wrapper {
 	flex: 1;
-	background: #f9f9f9;
+	background: #f0f0f1;
 	border: 1px solid #e5e5e5;
 	display: flex;
 	justify-content: center;
