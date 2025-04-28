@@ -9,10 +9,12 @@
  * Author URI:      https://serkanalgur.com.tr
  */
 
-if (! defined('ABSPATH')) {
+// phpcs:disable
+if (!defined('ABSPATH')) {
     exit;
 }
 define('PLGVER', '1.0.1');
+// phpcs:enable
 
 require_once plugin_dir_path(__FILE__) . '/includes/admin-custom-product-image-generator.php';
 
