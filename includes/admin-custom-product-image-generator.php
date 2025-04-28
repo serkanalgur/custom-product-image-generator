@@ -28,6 +28,7 @@ function cpig_render_admin_page()
                     <div class="cpig-sidebar">
                         <button id="cpig-select-image"
                             class="button button-primary"><?php esc_html_e('Select Base Image', 'cpig'); ?></button>
+                        <input type="hidden" id="cpig-base-image-id" />
                         <button id="cpig-add-text"
                             class="button"><?php esc_html_e('Add Text Field', 'cpig'); ?></button>
                         <div id="cpig-text-list" class="cpig-text-list"></div>
@@ -35,11 +36,13 @@ function cpig_render_admin_page()
                             <label><?php esc_html_e('Upload Logo 1:', 'cpig'); ?></label>
                             <button id="cpig-add-logo1"
                                 class="button"><?php esc_html_e('Add Logo 1', 'cpig'); ?></button>
+                            <input type="hidden" id="cpig-logo1-image-id" />
                         </div>
                         <div class="cpig-logo-item">
                             <label><?php esc_html_e('Upload Logo 2:', 'cpig'); ?></label>
                             <button id="cpig-add-logo2"
                                 class="button"><?php esc_html_e('Add Logo 2', 'cpig'); ?></button>
+                            <input type="hidden" id="cpig-logo2-image-id" />
                         </div>
                         <p>
                             <label><?php esc_html_e('Choose Product:', 'cpig'); ?><br>
@@ -63,6 +66,19 @@ function cpig_render_admin_page()
                 </div>
             </div>
             <div id="tabs1-js">
+                <table class="wp-list-table widefat fixed striped table-view-list" id="cpig-templates-list">
+                    <thead>
+                        <tr>
+                            <th><?php esc_html_e('ID', 'cpig'); ?></th>
+                            <th><?php esc_html_e('Name', 'cpig'); ?></th>
+                            <th><?php esc_html_e('JSON', 'cpig'); ?></th>
+                            <th><?php esc_html_e('Actions', 'cpig'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

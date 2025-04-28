@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Custom Product Image Generator
  * Description: Extended controls over WooCommerce product images.
- * Version:     1.0.1
+ * Version:     1.0.2
  * Text Domain: cpig
  * Author:          serkanalgur
  * Author URI:      https://serkanalgur.com.tr
@@ -13,7 +13,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-define('PLGVER', '1.0.1');
+define('PLGVER', '1.0.2');
 // phpcs:enable
 
 require_once plugin_dir_path(__FILE__) . '/includes/post-types.php';
@@ -177,4 +177,70 @@ function cpig_save_image()
 
     set_post_thumbnail(intval($_POST['product_id']), $attach_id);
     wp_send_json_success();
+}
+
+
+add_action('wp_ajax_cpig_list_templates', 'cpig_list_templates');
+function cpig_list_templates()
+{
+    check_ajax_referer('cpig_nonce', 'nonce');
+    $tpls = get_posts(['post_type' => 'cpig_template','numberposts' => -1]);
+    $data = [];
+    foreach ($tpls as $t) {
+        $data[] = [
+            'id'        => $t->ID,
+            'title'     => $t->post_title,
+            'category'  => get_cat_name(get_post_meta($t->ID, 'category_id', true)),
+            'attribute' => get_post_meta($t->ID, 'fabric_json', true),
+        ];
+    }
+    wp_send_json_success($data);
+}
+
+
+
+add_action('wp_ajax_cpig_delete_template', 'cpig_delete_template');
+function cpig_delete_template()
+{
+    check_ajax_referer('cpig_nonce', 'nonce');
+    $id = intval($_POST['template_id'] ?? 0);
+    wp_delete_post($id, true);
+    wp_send_json_success();
+}
+
+
+add_action('wp_ajax_cpig_save_template', 'cpig_save_update_template');
+function cpig_save_update_template()
+{
+    check_ajax_referer('cpig_nonce', 'nonce');
+    $id         = intval($_POST['template_id'] ?? 0);
+    $title      = sanitize_text_field($_POST['title']);
+    $base_image = intval($_POST['base_image']);
+    $logo1      = intval($_POST['logo1']);
+    $logo2      = intval($_POST['logo2']);
+    $json       = wp_kses_post($_POST['fabric_json']);
+
+    $post_args = [
+        'post_type'   => 'cpig_template',
+        'post_title'  => $title,
+        'post_status' => 'publish',
+        'meta_input'  => [
+            'base_image_id'   => $base_image,
+            'logo1_id'        => $logo1,
+            'logo2_id'        => $logo2,
+            'fabric_json'     => $json,
+        ],
+    ];
+
+    if ($id) {
+        $post_args['ID'] = $id;
+        wp_update_post($post_args);
+    } else {
+        $id = wp_insert_post($post_args);
+    }
+
+    if ($id) {
+        wp_send_json_success(['template_id' => $id]);
+    }
+    wp_send_json_error();
 }

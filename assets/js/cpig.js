@@ -15,6 +15,7 @@ jQuery(function ($) {
 	});
 
 	const canvas = new fabric.Canvas("cpig-canvas");
+	let currentTemplate = null;
 	let fieldCount = 0;
 	let grid = 10;
 	let logo1, logo2;
@@ -140,6 +141,7 @@ jQuery(function ($) {
 		frame.open();
 		frame.on("select", () => {
 			const sel = frame.state().get("selection").first().toJSON();
+			$("#cpig-base-image-id").val(sel.id);
 			fabric.Image.fromURL(sel.url, (img) => {
 				canvas.clear();
 				img.set({ selectable: false, evented: false });
@@ -186,6 +188,7 @@ jQuery(function ($) {
 		frame.open();
 		frame.on("select", () => {
 			const sel = frame.state().get("selection").first().toJSON();
+			$("#cpig-logo1-image-id").val(sel.id);
 			fabric.Image.fromURL(sel.url, (img) => {
 				img.scaleToWidth(100);
 				img.set({ left: 100, top: 100, originX: "center", originY: "center" });
@@ -202,6 +205,7 @@ jQuery(function ($) {
 		frame.open();
 		frame.on("select", () => {
 			const sel = frame.state().get("selection").first().toJSON();
+			$("#cpig-logo2-image-id").val(sel.id);
 			fabric.Image.fromURL(sel.url, (img) => {
 				img.scaleToWidth(100);
 				img.set({ left: 100, top: 100, originX: "center", originY: "center" });
@@ -238,7 +242,66 @@ jQuery(function ($) {
 		if (ttitle == null || ttitle == "") {
 			$.notify("Template title not set", "error");
 		} else {
-			$.notify("Template title:" + ttitle, "success");
+			RemoveGrid();
+			const payload = {
+				action: "cpig_save_template",
+				nonce: cpig_ajax.nonce,
+				template_id: currentTemplate,
+				title: ttitle,
+				base_image: $("#cpig-base-image-id").val(),
+				logo1: $("#cpig-logo1-image-id").val(),
+				logo2: $("#cpig-logo2-image-id").val(),
+				fabric_json: JSON.stringify(canvas.toJSON()),
+			};
+			$.post(cpig_ajax.ajax_url, payload, function (res) {
+				if (res.success) {
+					$.notify('Template "' + ttitle + '" saved!', "success");
+					loadList(); // your existing function that refreshes the table
+				} else {
+					$.notify("Error saving template", "error");
+				}
+			});
 		}
 	});
+
+	function loadList() {
+		$.post(cpig_ajax.ajax_url, { action: "cpig_list_templates", nonce: cpig_ajax.nonce }, (res) => {
+			if (!res.success) return;
+			const rows = res.data
+				.map(
+					(t) => `
+        <tr data-id="${t.id}">
+          <td>${t.id}</td>
+          <td>${t.title}</td>
+          <td><div style="overflow-y:scroll; width:100%;height:100%;max-height:100px">${t.attribute}</div></td>
+          <td>
+            <button class="button cpig-edit" data-id="${t.id}">Edit</button>
+            <button class="button cpig-delete" data-id="${t.id}">Delete</button>
+          </td>
+        </tr>
+      `
+				)
+				.join("");
+			$("#cpig-templates-list tbody").html(rows);
+		});
+	}
+
+	$("#cpig-templates-list").on("click", ".cpig-delete", function () {
+		if (!confirm("Delete this template?")) return;
+		const id = $(this).data("id");
+		$.post(
+			cpig_ajax.ajax_url,
+			{ action: "cpig_delete_template", template_id: id, nonce: cpig_ajax.nonce },
+			(res) => {
+				if (res.success) {
+					$.notify("Template Deleted", "success");
+					loadList();
+				} else {
+					$.notify("Something Wrong", "error");
+				}
+			}
+		);
+	});
+
+	loadList();
 });
