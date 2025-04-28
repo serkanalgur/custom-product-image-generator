@@ -16,6 +16,7 @@ if (!defined('ABSPATH')) {
 define('PLGVER', '1.0.1');
 // phpcs:enable
 
+require_once plugin_dir_path(__FILE__) . '/includes/post-types.php';
 require_once plugin_dir_path(__FILE__) . '/includes/admin-custom-product-image-generator.php';
 
 add_action('admin_menu', 'cpig_add_admin_menu');

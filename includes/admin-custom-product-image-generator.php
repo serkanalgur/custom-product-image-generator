@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
 
 function cpig_render_admin_page()
 {
-?>
+    ?>
 <div class="wrap">
     <h1><?php esc_html_e('Custom Product Image Generator', 'cpig'); ?> <small>by Serkan Algur</small></h1>
     <div id="tab-container" class="tab-container">
@@ -68,5 +68,5 @@ function cpig_render_admin_page()
     </div>
 </div>
 
-<?php
+    <?php
 }
