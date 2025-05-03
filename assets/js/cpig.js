@@ -270,16 +270,16 @@ jQuery(function ($) {
 			const rows = res.data
 				.map(
 					(t) => `
-        <tr data-id="${t.id}">
-          <td>${t.id}</td>
-          <td>${t.title}</td>
-          <td><div style="overflow-y:scroll; width:100%;height:100%;max-height:100px">${t.attribute}</div></td>
-          <td>
-            <button class="button cpig-edit" data-id="${t.id}">Edit</button>
-            <button class="button cpig-delete" data-id="${t.id}">Delete</button>
-          </td>
-        </tr>
-      `
+							<tr data-id="${t.id}">
+							<td>${t.id}</td>
+							<td>${t.title}</td>
+							<td><div style="overflow-y:scroll; width:100%;height:100%;max-height:100px">${t.attribute}</div></td>
+							<td>
+								<button class="button cpig-edit" data-id="${t.id}">Edit</button>
+								<button class="button cpig-delete" data-id="${t.id}">Delete</button>
+							</td>
+							</tr>
+							`
 				)
 				.join("");
 			$("#cpig-templates-list tbody").html(rows);
@@ -287,7 +287,7 @@ jQuery(function ($) {
 	}
 
 	$("#cpig-templates-list").on("click", ".cpig-delete", function () {
-		if (!confirm("Delete this template?")) return;
+		if (!confirm("Do you want to delete this template?")) return;
 		const id = $(this).data("id");
 		$.post(
 			cpig_ajax.ajax_url,

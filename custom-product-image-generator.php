@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Custom Product Image Generator
  * Description: Extended controls over WooCommerce product images.
- * Version:     1.0.2
+ * Version:     1.0.23
  * Text Domain: cpig
  * Author:          serkanalgur
  * Author URI:      https://serkanalgur.com.tr
@@ -13,11 +13,13 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-define('PLGVER', '1.0.2');
+define('PLGVER', '1.0.23');
 // phpcs:enable
 
 require_once plugin_dir_path(__FILE__) . '/includes/post-types.php';
 require_once plugin_dir_path(__FILE__) . '/includes/admin-custom-product-image-generator.php';
+require_once plugin_dir_path(__FILE__) . '/includes/admin-product-metabox.php';
+require_once plugin_dir_path(__FILE__) . '/includes/class-template-engine.php';
 
 add_action('admin_menu', 'cpig_add_admin_menu');
 function cpig_add_admin_menu()
@@ -195,7 +197,7 @@ function cpig_list_templates()
         ];
     }
     wp_send_json_success($data);
-}
+};
 
 
 
@@ -206,7 +208,7 @@ function cpig_delete_template()
     $id = intval($_POST['template_id'] ?? 0);
     wp_delete_post($id, true);
     wp_send_json_success();
-}
+};
 
 
 add_action('wp_ajax_cpig_save_template', 'cpig_save_update_template');
@@ -244,3 +246,17 @@ function cpig_save_update_template()
     }
     wp_send_json_error();
 }
+
+
+add_action('wp_ajax_cpig_get_template_preview', 'get_template_preview');
+function get_template_preview()
+{
+    check_ajax_referer('cpig_nonce', 'nonce');
+    $tpl_id = intval($_POST['template_id'] ?? 0);
+    if (!$tpl_id) {
+        wp_send_json_error();
+    }
+    $base   = get_post_meta($tpl_id, 'base_image_id', true);
+    $url    = $base ? wp_get_attachment_url($base) : '';
+    wp_send_json(['preview_url' => $url]);
+};
