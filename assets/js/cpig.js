@@ -46,48 +46,58 @@ jQuery(function ($) {
 		}
 	}
 
-	function createFieldControls(idx) {
+	function createFieldControls(idx, options = null) {
+		let fText = options !== null ? options.text : "";
+		let fSize = options !== null ? options.fontSize : 40;
+		let fColor = options !== null ? options.fill : "#000000";
+		let fBActive = options !== null && options.fontWeight == "bold" ? "active" : "";
+		let fIActive = options !== null && options.fontStyle == "italic" ? "active" : "";
+		let fUActive = options !== null && options.underline ? "active" : "";
 		return $(
-			`<div class="cpig-text-item" data-idx="${idx}">
-        <input type="text" class="cpig-text-field" data-idx="${idx}" placeholder="Text #${idx + 1}" />
+			`<div class="cpig-text-item"  data-idx="${idx}">
+        <input type="text" value="${fText}" class="cpig-text-field" data-idx="${idx}" placeholder="Text #${idx + 1}" />
         <select class="cpig-font-family" data-idx="${idx}">
           <option>Arial</option><option>Helvetica</option><option>Tahoma</option>
           <option>Roboto</option><option>Montserrat</option><option>Open Sans</option>
           <option>Noto Sans</option><option>Inter</option><option>Oswald</option>
         </select>
-        <input type="number" class="cpig-font-size" data-idx="${idx}" min="10" max="100" value="40" />
-        <input type="color" class="cpig-font-color" data-idx="${idx}" value="#000000" />
-        <button class="button cpig-bold-toggle" data-idx="${idx}" title="Bold">B</button>
-        <button class="button cpig-italic-toggle" data-idx="${idx}" title="Italic">I</button>
-        <button class="button cpig-underline-toggle" data-idx="${idx}" title="Underline">U</button>
-        <select class="cpig-text-align" data-idx="${idx}">
-          <option value="left">Left</option>
-          <option value="center">Center</option>
-          <option value="right">Right</option>
-        </select>
+        <input type="number" class="cpig-font-size" data-idx="${idx}" min="10" max="100" value="${fSize}" />
+        <input type="color" class="cpig-font-color" data-idx="${idx}" value="${fColor}" />
+        <button class="button cpig-bold-toggle ${fBActive}" data-idx="${idx}" title="Bold">B</button>
+        <button class="button cpig-italic-toggle ${fIActive}" data-idx="${idx}" title="Italic">I</button>
+        <button class="button cpig-underline-toggle ${fUActive}" data-idx="${idx}" title="Underline">U</button>
 		<select class="use-text-template" data-idx="${idx}">
 			<option value="">Select Template</option>
 			<option value="{product_name}">Product Name</option>
 		  <option value="{sku_code}">SKU</option>
 		</select>
+		<button class="button cpig-button-remove-item" data-idx="${idx}" style="color:red">&times;</button>
 		<!--<button class="button cpig-rempove-text" data-idx="${idx}"">Remove</button>-->
       </div>`
 		);
 	}
 
-	function addTextField() {
+	function addTextField(options = null) {
 		const idx = fieldCount++;
-		const textObj = new fabric.IText("Text", {
-			left: canvas.getWidth() / 2,
-			top: canvas.getHeight() / 4 + idx * 30,
-			fontFamily: "Arial",
-			fontSize: 40,
-			fill: "#000",
-			originX: "center",
+		let fText = options !== null ? options.text : "Text";
+		let fSize = options !== null ? options.fontSize : 40;
+		let fColor = options !== null ? options.fill : "#000000";
+		let fLeft = options !== null ? options.left : canvas.getWidth() / 2;
+		let fTop = options !== null ? options.top : canvas.getHeight() / 4 + idx * 30;
+		let fFamliy = options !== null ? options.fontFamily : "Arial";
+		let fOrigin = options !== null ? options.originX : "center";
+
+		const textObj = new fabric.IText(fText, {
+			left: fLeft,
+			top: fTop,
+			fontFamily: fFamliy,
+			fontSize: fSize,
+			fill: fColor,
+			originX: fOrigin,
 		});
 		canvas.add(textObj).setActiveObject(textObj);
+		const $ctrl = createFieldControls(idx, options);
 
-		const $ctrl = createFieldControls(idx);
 		$("#cpig-text-list").append($ctrl);
 
 		$ctrl.on("input change click", "input, select, button", function () {
@@ -101,7 +111,7 @@ jQuery(function ($) {
 				fontWeight: $(`.cpig-bold-toggle[data-idx="${i}"]`).hasClass("active") ? "bold" : "normal",
 				fontStyle: $(`.cpig-italic-toggle[data-idx="${i}"]`).hasClass("active") ? "italic" : "normal",
 				underline: $(`.cpig-underline-toggle[data-idx="${i}"]`).hasClass("active"),
-				textAlign: $(`.cpig-text-align[data-idx="${i}"]`).val(),
+				/*textAlign: $(`.cpig-text-align[data-idx="${i}"]`).val(),*/
 			});
 			canvas.renderAll();
 		});
@@ -118,12 +128,19 @@ jQuery(function ($) {
 
 		$ctrl.find(".use-text-template").on("change", function () {
 			const i = $(this).data("idx");
-			console.log($(this).val());
+			//console.log($(this).val());
 			$ctrl.find(`.cpig-text-field[data-idx="${i}"]`).val($(this).val());
+		});
+
+		$ctrl.find(".cpig-button-remove-item").on("click", function () {
+			const i = $(this).data("idx");
+			let active = canvas.getActiveObject(i);
+			canvas.remove(active);
+			$ctrl.remove();
 		});
 	}
 
-	canvas.setWidth(600).setHeight(400);
+	//canvas.setWidth(600).setHeight(400);
 
 	canvas.on("text:changed", function (event) {
 		// Get all iText objects on the canvas
@@ -150,8 +167,8 @@ jQuery(function ($) {
 				canvas.sendToBack(img);
 				addGridToFabric(img.width, img.height);
 				fieldCount = 0;
-				$("#cpig-text-list").empty();
-				addTextField();
+				//$("#cpig-text-list").empty();
+				//addTextField();
 			});
 		});
 	});
@@ -189,6 +206,7 @@ jQuery(function ($) {
 		frame.on("select", () => {
 			const sel = frame.state().get("selection").first().toJSON();
 			$("#cpig-logo1-image-id").val(sel.id);
+			//$("#cpig-logo-1-preview").src(sel.url);
 			fabric.Image.fromURL(sel.url, (img) => {
 				img.scaleToWidth(100);
 				img.set({ left: 100, top: 100, originX: "center", originY: "center" });
@@ -206,6 +224,7 @@ jQuery(function ($) {
 		frame.on("select", () => {
 			const sel = frame.state().get("selection").first().toJSON();
 			$("#cpig-logo2-image-id").val(sel.id);
+			//$("#cpig-logo-2-preview").src(sel.url);
 			fabric.Image.fromURL(sel.url, (img) => {
 				img.scaleToWidth(100);
 				img.set({ left: 100, top: 100, originX: "center", originY: "center" });
@@ -238,7 +257,10 @@ jQuery(function ($) {
 	});
 
 	$("#cpig-save-as-template").on("click", () => {
-		let ttitle = prompt("Enter Template Name");
+		let ttitle = jQuery("#cpig-template-title").val();
+		if (!ttitle) {
+			let ttitle = prompt("Enter Template Name");
+		}
 		if (ttitle == null || ttitle == "") {
 			$.notify("Template title not set", "error");
 		} else {
@@ -299,6 +321,66 @@ jQuery(function ($) {
 				} else {
 					$.notify("Something Wrong", "error");
 				}
+			}
+		);
+	});
+
+	$("#cpig-templates-list").on("click", ".cpig-edit", function () {
+		currentTemplate = $(this).data("id");
+		$.post(
+			cpig_ajax.ajax_url,
+			{ action: "cpig_get_template", template_id: currentTemplate, nonce: cpig_ajax.nonce },
+			(res) => {
+				if (!res.success) return;
+				const d = res.data;
+				//canvas.clear();
+				$("#cpig-template-title").val(d.title);
+				$("#cpig-template-id").val(d.id);
+				$("#cpig-current-action").val("edit-template");
+				$("#cpig-base-image-id").val(d.base_image_id);
+				$("#cpig-template-logo1-id").val(d.logo1_id);
+				$("#cpig-template-logo2-id").val(d.logo2_id);
+				let savedJSON = JSON.parse(d.fabric_json);
+				const width = savedJSON.objects[0].width;
+				const height = savedJSON.objects[0].height;
+				canvas.setWidth(width);
+				canvas.setHeight(height);
+				/*canvas.loadFromJSON(savedJSON, () => {
+				const width =savedJSON.objects[0].width;
+				const height = savedJSON.objects[0].height;
+				canvas.setWidth(width);
+				canvas.setHeight(height);
+				canvas.requestRenderAll();
+				canvas.setActiveObject(canvas.item(0));
+				canvas.setActiveObject(canvas.item(savedson-1));
+
+			});*/
+
+				let miObjs = savedJSON.objects;
+				miObjs.forEach(function (key, index) {
+					switch (key.type) {
+						case "image":
+							fabric.Image.fromURL(key.src, (img) => {
+								/*canvas.clear();*/
+								img.set({ selectable: false, evented: false });
+								canvas.add(img);
+								canvas.sendToBack(img);
+								addGridToFabric(img.width, img.height);
+								fieldCount = 0;
+								//$("#cpig-text-list").empty();
+								//addTextField();
+							});
+							break;
+						case "i-text":
+							addTextField(key);
+							break;
+					}
+				});
+
+				let datz = `<h3>Editing ${d.title} template</h3>`;
+				jQuery(".cpig-sidebar").append(datz);
+				jQuery("#cpig-generate").hide();
+				jQuery("#tab1").click();
 			}
 		);
 	});

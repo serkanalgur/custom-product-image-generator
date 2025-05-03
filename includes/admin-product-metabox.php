@@ -48,9 +48,9 @@ function cpig_template_metabox_cb($post)
 
 function save_post_fields_of_cpig($post_id)
 {
-    if (!isset($_POST['cpig_template_nonce']) || !wp_verify_nonce($_POST['cpig_template_nonce'], 'cpig_template_meta')) {
+    /*if (!isset($_POST['cpig_template_nonce']) || !wp_verify_nonce($_POST['cpig_template_nonce'], 'cpig_template_meta')) {
         return;
-    }
+    }*/
     update_post_meta($post_id, '_cpig_template', sanitize_text_field($_POST['cpig_selected_template']));
     update_post_meta($post_id, '_cpig_regenerate', isset($_POST['cpig_regenerate']) ? 1 : 0);
 }

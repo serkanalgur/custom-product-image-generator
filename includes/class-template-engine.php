@@ -10,7 +10,7 @@ class CPIG_Template_Engine
         // Load template meta
         $base_id      = get_post_meta($template_id, 'base_image_id', true);
         $fabric_json  = get_post_meta($template_id, 'fabric_json', true);
-        //$placeholders = get_post_meta( $template_id, 'placeholders', true ) ?: [];
+        $placeholders = get_post_meta($template_id, 'placeholders', true) ?: [];
 
         // Load base image path
         $base_src = wp_get_attachment_image_src($base_id, 'full');
@@ -28,6 +28,7 @@ class CPIG_Template_Engine
         // Choose renderer: Imagick if available, else GD
         if (class_exists('Imagick')) {
             $img = new Imagick();
+            $img->setSize($data['objects'][0]['width'], $data['objects'][0]['height']);
             $img->readImage($base_path);
             $draw = new ImagickDraw();
 
@@ -60,7 +61,7 @@ class CPIG_Template_Engine
                     $size   = ! empty($obj['fontSize']) ? intval($obj['fontSize']) : 24;
                     $color  = ! empty($obj['fill']) ? $obj['fill'] : '#000000';
                     $left   = isset($obj['left']) ? intval($obj['left']) : 0;
-                    $top    = isset($obj['top']) ? intval($obj['top']) : 0;
+                    $top    = isset($obj['top']) ? intval($obj['top'] + $size) : 0;
 
                     $draw->setFont($font);
                     $draw->setFontSize($size);
@@ -83,14 +84,15 @@ class CPIG_Template_Engine
                 if (! empty($obj['type']) && $obj['type'] === 'image' && ! empty($obj['src'])) {
                     $att_id = attachment_url_to_postid($obj['src']);
                     $path   = $att_id ? get_attached_file($att_id) : wp_normalize_path(ABSPATH . str_replace(home_url('/'), '', $obj['src']));
+                    echo $path;
                     if (file_exists($path)) {
                         $overlay = imagecreatefromstring(file_get_contents($path));
                         $w = imagesx($overlay);
                         $h = imagesy($overlay);
                         $scaleX = isset($obj['scaleX']) ? floatval($obj['scaleX']) : 1;
                         $scaleY = isset($obj['scaleY']) ? floatval($obj['scaleY']) : 1;
-                        $nw = $w * $scaleX;
-                        $nh = $h * $scaleY;
+                        $nw = intval($w * $scaleX);
+                        $nh = intval($h * $scaleY);
                         $tmp = imagecreatetruecolor($nw, $nh);
                         imagealphablending($tmp, false);
                         imagesavealpha($tmp, true);

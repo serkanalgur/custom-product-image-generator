@@ -19,8 +19,8 @@ function cpig_render_admin_page()
     <h1><?php esc_html_e('Custom Product Image Generator', 'cpig'); ?> <small>by Serkan Algur</small></h1>
     <div id="tab-container" class="tab-container">
         <ul class='etabs'>
-            <li class='tab'><a href="#tabs1-html">Generator</a></li>
-            <li class='tab'><a href="#tabs1-js">Templates</a></li>
+            <li class='tab'><a href="#tabs1-html" id="tab1">Generator</a></li>
+            <li class='tab'><a href="#tabs1-js" id="tab2">Templates</a></li>
         </ul>
         <div class="panel-container">
             <div id="tabs1-html">
@@ -37,12 +37,16 @@ function cpig_render_admin_page()
                             <button id="cpig-add-logo1"
                                 class="button"><?php esc_html_e('Add Logo 1', 'cpig'); ?></button>
                             <input type="hidden" id="cpig-logo1-image-id" />
+                            <img src="" id="cpig-logo-1-preview" style="max-width:100px; max-height:100px;"
+                                data-idx="" />
                         </div>
                         <div class="cpig-logo-item">
                             <label><?php esc_html_e('Upload Logo 2:', 'cpig'); ?></label>
                             <button id="cpig-add-logo2"
                                 class="button"><?php esc_html_e('Add Logo 2', 'cpig'); ?></button>
                             <input type="hidden" id="cpig-logo2-image-id" />
+                            <img src="" id="cpig-logo-2-preview" style="max-width:100px; max-height:100px;"
+                                data-idx="" />
                         </div>
                         <p>
                             <label><?php esc_html_e('Choose Product:', 'cpig'); ?><br>
@@ -55,6 +59,9 @@ function cpig_render_admin_page()
                         <button id="cpig-save-as-template" class="button"><span
                                 class="dashicons dashicons-update mika dnon"></span>
                             <?php esc_html_e('Save as Template', 'cpig'); ?></button>
+                        <input type="hidden" id="cpig-template-title" />
+                        <input type="hidden" id="cpig-template-id" />
+                        <input type="hidden" id="cpig-current-action" />
                     </div>
                     <div class="cpig-canvas-wrapper">
                         <canvas id="cpig-canvas"></canvas>
@@ -84,5 +91,5 @@ function cpig_render_admin_page()
     </div>
 </div>
 
-    <?php
+<?php
 }

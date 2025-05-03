@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Custom Product Image Generator
  * Description: Extended controls over WooCommerce product images.
- * Version:     1.0.23
+ * Version:     1.0.3
  * Text Domain: cpig
  * Author:          serkanalgur
  * Author URI:      https://serkanalgur.com.tr
@@ -13,7 +13,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-define('PLGVER', '1.0.23');
+define('PLGVER', '1.0.3');
 // phpcs:enable
 
 require_once plugin_dir_path(__FILE__) . '/includes/post-types.php';
@@ -259,4 +259,23 @@ function get_template_preview()
     $base   = get_post_meta($tpl_id, 'base_image_id', true);
     $url    = $base ? wp_get_attachment_url($base) : '';
     wp_send_json(['preview_url' => $url]);
+};
+
+
+add_action('wp_ajax_cpig_get_template', 'cpig_get_editable_template');
+function cpig_get_editable_template()
+{
+    check_ajax_referer('cpig_nonce', 'nonce');
+    $id   = intval($_POST['template_id'] ?? 0);
+    $post = get_post($id);
+    if (!$post) {
+        wp_send_json_error();
+    }
+    $meta = [
+        'base_image_id'   => get_post_meta($id, 'base_image_id', true),
+        'logo1_id'        => get_post_meta($id, 'logo1_id', true),
+        'logo2_id'        => get_post_meta($id, 'logo2_id', true),
+        'fabric_json'     => get_post_meta($id, 'fabric_json', true),
+    ];
+    wp_send_json_success(array_merge(['id' => $id,'title' => $post->post_title], $meta));
 };
